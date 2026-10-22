@@ -1,0 +1,16 @@
+{
+  "version": "context.v1",
+  "synthetic_fixture": true,
+  "normalization": "nfc-lf-v1",
+  "refs": [
+    {
+      "ref_id": "s1",
+      "kind": "revision",
+      "object_id": "synthetic-revision-a",
+      "start_char": 0,
+      "end_char": 33,
+      "quote": "本例通过兴趣分与质量分的加权和展示排序变化；数值与权重仅用于教学。",
+      "quote_sha256": "53688c7c343048831a9001ed6946eaa260ff4e867dd6d89b78d1ce76eb9f0316"
+    }
+  ]
+}

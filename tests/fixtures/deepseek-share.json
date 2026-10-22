@@ -1,0 +1,16 @@
+{
+  "code": 0,
+  "msg": "",
+  "data": {
+    "biz_code": 0,
+    "biz_data": {
+      "title": "如何建立长期记忆？",
+      "messages": [
+        {"message_id":1,"parent_id":null,"role":"USER","status":"FINISHED","fragments":[{"type":"REQUEST","content":"知识卡片为什么需要保存原始问题？"}]},
+        {"message_id":2,"parent_id":1,"role":"ASSISTANT","status":"FINISHED","fragments":[{"type":"THINK","content":"这是测试用的合成思考片段，不是最终结论。"},{"type":"RESPONSE","content":"原始问题保留当时的目的与上下文，让后续检索能够定位到当时的完整回答。"}]},
+        {"message_id":3,"parent_id":2,"role":"USER","status":"FINISHED","fragments":[{"type":"REQUEST","content":"以后怎么再次找到它？"}]},
+        {"message_id":4,"parent_id":3,"role":"ASSISTANT","status":"FINISHED","fragments":[{"type":"RESPONSE","content":"可以搜索问题里的关键词，并沿着消息引用重新打开原文。"}]}
+      ]
+    }
+  }
+}

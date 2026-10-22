@@ -1,0 +1,1411 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cardspace.local/contracts/experience.v1.schema.json",
+  "title": "CardSpace Experience v1 - implementation draft",
+  "description": "设计草案。JSON Schema 之外仍须校验引用、节点唯一性、值域、类型、动作图无环、总节点/深度/步骤预算。不执行生成 JavaScript。",
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": "experience.v1"
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "mode": {
+      "enum": [
+        "explainer",
+        "prototype"
+      ]
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/assumption"
+      },
+      "maxItems": 20,
+      "minItems": 0
+    },
+    "state": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+        "not": {
+          "enum": [
+            "constructor",
+            "prototype"
+          ]
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/state"
+      },
+      "maxProperties": 30
+    },
+    "datasets": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+        "not": {
+          "enum": [
+            "constructor",
+            "prototype"
+          ]
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/dataset"
+      },
+      "maxProperties": 20
+    },
+    "derivations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/derivation"
+      },
+      "maxItems": 20,
+      "minItems": 0
+    },
+    "actions": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+        "not": {
+          "enum": [
+            "constructor",
+            "prototype"
+          ]
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/action"
+      },
+      "maxProperties": 50
+    },
+    "view": {
+      "$ref": "#/$defs/node"
+    }
+  },
+  "required": [
+    "version",
+    "title",
+    "mode",
+    "assumptions",
+    "state",
+    "datasets",
+    "derivations",
+    "actions",
+    "view"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "scalar": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": -1000000000.0,
+          "maximum": 1000000000.0
+        },
+        {
+          "type": "string",
+          "maxLength": 1000
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "expr": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "literal": {
+              "$ref": "#/$defs/scalar"
+            }
+          },
+          "required": [
+            "literal"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            }
+          },
+          "required": [
+            "state"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "enum": [
+                "add",
+                "sub",
+                "mul",
+                "div",
+                "min",
+                "max",
+                "clamp",
+                "eq",
+                "lt",
+                "and",
+                "or",
+                "if"
+              ]
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/expr"
+              },
+              "maxItems": 4,
+              "minItems": 1
+            }
+          },
+          "required": [
+            "op",
+            "args"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "state": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "number"
+            },
+            "initial": {
+              "type": "number",
+              "minimum": -1000000000.0,
+              "maximum": 1000000000.0
+            },
+            "min": {
+              "type": "number",
+              "minimum": -1000000000.0,
+              "maximum": 1000000000.0
+            },
+            "max": {
+              "type": "number",
+              "minimum": -1000000000.0,
+              "maximum": 1000000000.0
+            },
+            "step": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "kind",
+            "initial",
+            "min",
+            "max",
+            "step"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "boolean"
+            },
+            "initial": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "initial"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "string"
+            },
+            "initial": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "max_length": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 512
+            }
+          },
+          "required": [
+            "kind",
+            "initial",
+            "max_length"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "dataset": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "enum": [
+            "source",
+            "derived",
+            "illustration",
+            "hypothesis"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+            "not": {
+              "enum": [
+                "constructor",
+                "prototype"
+              ]
+            }
+          },
+          "maxItems": 10,
+          "minItems": 0
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "additionalProperties": {
+              "$ref": "#/$defs/scalar"
+            },
+            "maxProperties": 32
+          },
+          "maxItems": 500,
+          "minItems": 0
+        }
+      },
+      "required": [
+        "origin",
+        "source_refs",
+        "rows"
+      ],
+      "additionalProperties": false
+    },
+    "assumption": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+          "not": {
+            "enum": [
+              "constructor",
+              "prototype"
+            ]
+          }
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "origin": {
+          "enum": [
+            "source",
+            "derived",
+            "illustration",
+            "hypothesis"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+            "not": {
+              "enum": [
+                "constructor",
+                "prototype"
+              ]
+            }
+          },
+          "maxItems": 10,
+          "minItems": 0
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "origin",
+        "source_refs"
+      ],
+      "additionalProperties": false
+    },
+    "derivation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+          "not": {
+            "enum": [
+              "constructor",
+              "prototype"
+            ]
+          }
+        },
+        "op": {
+          "const": "rank_linear"
+        },
+        "input": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+          "not": {
+            "enum": [
+              "constructor",
+              "prototype"
+            ]
+          }
+        },
+        "terms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+                "not": {
+                  "enum": [
+                    "constructor",
+                    "prototype"
+                  ]
+                }
+              },
+              "weight": {
+                "$ref": "#/$defs/expr"
+              }
+            },
+            "required": [
+              "field",
+              "weight"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 8,
+          "minItems": 1
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        }
+      },
+      "required": [
+        "id",
+        "op",
+        "input",
+        "terms",
+        "limit"
+      ],
+      "additionalProperties": false
+    },
+    "action": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "set"
+            },
+            "state_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "value": {
+              "$ref": "#/$defs/expr"
+            }
+          },
+          "required": [
+            "kind",
+            "state_key",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "transition"
+            },
+            "state_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "edges": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "to": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "guard": {
+                    "$ref": "#/$defs/expr"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 50,
+              "minItems": 1
+            }
+          },
+          "required": [
+            "kind",
+            "state_key",
+            "edges"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "sequence"
+            },
+            "action_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+                "not": {
+                  "enum": [
+                    "constructor",
+                    "prototype"
+                  ]
+                }
+              },
+              "maxItems": 10,
+              "minItems": 1
+            }
+          },
+          "required": [
+            "kind",
+            "action_ids"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "append_row"
+            },
+            "data_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "values": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+                "not": {
+                  "enum": [
+                    "constructor",
+                    "prototype"
+                  ]
+                }
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/expr"
+              },
+              "maxProperties": 32
+            }
+          },
+          "required": [
+            "kind",
+            "data_key",
+            "values"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "remove_row"
+            },
+            "data_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "row_id": {
+              "$ref": "#/$defs/expr"
+            }
+          },
+          "required": [
+            "kind",
+            "data_key",
+            "row_id"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "node": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "Stack"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "children": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/node"
+              },
+              "maxItems": 30,
+              "minItems": 1
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "children"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "Grid"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "columns": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3
+            },
+            "children": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/node"
+              },
+              "maxItems": 30,
+              "minItems": 1
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "columns",
+            "children"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "Heading"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "text"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "Paragraph"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 4000
+            },
+            "origin": {
+              "enum": [
+                "source",
+                "derived",
+                "illustration",
+                "hypothesis"
+              ]
+            },
+            "source_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+                "not": {
+                  "enum": [
+                    "constructor",
+                    "prototype"
+                  ]
+                }
+              },
+              "maxItems": 10,
+              "minItems": 0
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "text",
+            "origin",
+            "source_refs"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "Slider"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "state_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "label",
+            "state_key"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "Toggle"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "state_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "label",
+            "state_key"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "Input"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "state_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "label",
+            "state_key"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "Select"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "state_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "options": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "value": {
+                    "type": "string",
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "label",
+                  "value"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 20,
+              "minItems": 1
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "label",
+            "state_key",
+            "options"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "Button"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "action_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "label",
+            "action_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "BarChart"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "data_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "label_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "value_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "label",
+            "data_key",
+            "label_key",
+            "value_key"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "LineChart"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "label": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "data_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "label_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "value_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "label",
+            "data_key",
+            "label_key",
+            "value_key"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "DataTable"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "data_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+                    "not": {
+                      "enum": [
+                        "constructor",
+                        "prototype"
+                      ]
+                    }
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "field",
+                  "label"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 10,
+              "minItems": 1
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "data_key",
+            "columns"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "List"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "data_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "label_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "data_key",
+            "label_key"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "FlowGraph"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "nodes_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "edges_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "active_state_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "nodes_key",
+            "edges_key",
+            "active_state_key"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "StepViewer"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "steps_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "step_state_key": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "steps_key",
+            "step_state_key"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SourceLink"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            },
+            "visible_when": {
+              "$ref": "#/$defs/expr"
+            },
+            "ref_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$",
+              "not": {
+                "enum": [
+                  "constructor",
+                  "prototype"
+                ]
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "ref_id"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "kind": "independent-golden-oracle",
+  "tolerance": 1e-06,
+  "cases": [
+    {
+      "event": {
+        "state_key": "alpha",
+        "value": 0.8
+      },
+      "expected_order": [
+        "A",
+        "B",
+        "C"
+      ],
+      "expected_scores": {
+        "A": 0.78,
+        "B": 0.56,
+        "C": 0.28
+      }
+    },
+    {
+      "event": {
+        "state_key": "alpha",
+        "value": 0.2
+      },
+      "expected_order": [
+        "B",
+        "C",
+        "A"
+      ],
+      "expected_scores": {
+        "A": 0.42,
+        "B": 0.74,
+        "C": 0.52
+      }
+    }
+  ]
+}

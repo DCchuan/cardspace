@@ -1,0 +1,22 @@
+.venv/
+node_modules/
+dist/
+__pycache__/
+.pytest_cache/
+*.pyc
+.env
+output/
+.DS_Store
+*.tsbuildinfo
+.env.*
+!.env.example
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+*.db
+*.token
+*.secret
+data/
+backups/
+# Original user-provided planning attachment, not part of the public source distribution.
+docs/PRD.md

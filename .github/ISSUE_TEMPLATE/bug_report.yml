@@ -1,0 +1,20 @@
+name: 问题反馈 / Bug report
+description: 用合成样本描述可复现的问题。
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 发生了什么？ / What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      description: 不要提交真实对话、令牌、密钥或私人分享链接。
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 版本、系统与浏览器 / Version, OS, browser

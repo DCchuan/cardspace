@@ -1,0 +1,16 @@
+{
+  "name": "cardspace",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "npm --prefix apps/web run build",
+    "start": "node scripts/start.mjs",
+    "test": ".venv/bin/python -m pytest tests -q && node scripts/test_frontend.mjs",
+    "source": ".venv/bin/python scripts/package_source.py",
+    "notices": ".venv/bin/python scripts/third_party_notices.py",
+    "test:ui": "node scripts/test_frontend.mjs"
+  },
+  "license": "MIT",
+  "description": "A local-first, open-source memory workspace for humans and AI agents."
+}
