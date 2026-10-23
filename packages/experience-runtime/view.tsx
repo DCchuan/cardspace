@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
+import { acknowledge, controlValues } from "./controls.mjs";
 declare const __WORKER_SOURCE__: string;
 let port: MessagePort | null = null,
   instance = "",
@@ -56,16 +57,22 @@ function dispatch(m: any) {
     );
     send("RUNTIME_ERROR", { code: "WORKER_TIMEOUT" });
   }, 1500);
-  worker?.postMessage({ ...m, id: ++serial });
+  const id = ++serial;
+  worker?.postMessage({ ...m, id });
+  return id;
 }
 function event(e: any) {
-  dispatch({ type: "EVENT", event: e });
+  return dispatch({ type: "EVENT", event: e });
 }
 function App() {
+  const [pending, setPending] = useState<
+    Record<string, { id: number; value: any }>
+  >({});
   const [v, setV] = useState<any>(null),
     [error, setError] = useState("");
   useEffect(() => {
     const f = (x: any) => {
+      setPending((previous) => acknowledge(previous, x.id));
       if (x.type === "ERROR") setError(x.code);
       else {
         setError("");
@@ -77,13 +84,15 @@ function App() {
       listeners.delete(f);
     };
   }, []);
-  const state = v?.state.values || {},
+  const state = controlValues(v?.state.values || {}, pending),
     data = v?.data || {};
   function node(n: any): React.ReactNode {
     if (v?.visible[n.id] === false) return null;
     const props = { key: n.id };
-    const change = (value: any) =>
-      event({ type: "INPUT", node_id: n.id, value });
+    const change = (value: any) => {
+      const id = event({ type: "INPUT", node_id: n.id, value });
+      setPending((previous) => ({ ...previous, [n.state_key]: { id, value } }));
+    };
     const rows = data[n.data_key] || [];
     switch (n.kind) {
       case "Stack":

@@ -128,3 +128,20 @@ test("snapshots roundtrip local prototype state and reject unsafe values", async
     }),
   );
 });
+test("older Worker responses do not overwrite newer local control input", async () => {
+  const { acknowledge, controlValues } =
+    await import("../../packages/experience-runtime/controls.mjs");
+  const pending = {
+    alpha: { id: 12, value: 0.2 },
+    task: { id: 9, value: "新输入" },
+  };
+  const first = acknowledge(pending, 10);
+  assert.deepEqual(controlValues({ alpha: 0.8, task: "新输入" }, first), {
+    alpha: 0.2,
+    task: "新输入",
+  });
+  assert.deepEqual(acknowledge(first, 12), {});
+  assert.deepEqual(controlValues({ alpha: 0.2 }, acknowledge(first, 12)), {
+    alpha: 0.2,
+  });
+});
