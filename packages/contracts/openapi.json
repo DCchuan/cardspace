@@ -2,9 +2,685 @@
   "openapi": "3.1.0",
   "info": {
     "title": "CardSpace API",
-    "version": "0.3.0"
+    "version": "0.4.0"
   },
   "paths": {
+    "/api/v1/cards/{card_id}/experience-quotes": {
+      "post": {
+        "summary": "Quote",
+        "operationId": "quote_api_v1_cards__card_id__experience_quotes_post",
+        "parameters": [
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Card Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Quote"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/experience-quotes/{qid}/generate": {
+      "post": {
+        "summary": "Generate",
+        "operationId": "generate_api_v1_experience_quotes__qid__generate_post",
+        "parameters": [
+          {
+            "name": "qid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Qid"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Generate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cards/{card_id}/experiences": {
+      "get": {
+        "summary": "Listing",
+        "operationId": "listing_api_v1_cards__card_id__experiences_get",
+        "parameters": [
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Card Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cards/{card_id}/experience-context": {
+      "get": {
+        "summary": "Prepare",
+        "operationId": "prepare_api_v1_cards__card_id__experience_context_get",
+        "parameters": [
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Card Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cards/{card_id}/experience-sources": {
+      "post": {
+        "summary": "Submit",
+        "operationId": "submit_api_v1_cards__card_id__experience_sources_post",
+        "parameters": [
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Card Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Source"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/experiences/{eid}": {
+      "get": {
+        "summary": "Detail",
+        "operationId": "detail_api_v1_experiences__eid__get",
+        "parameters": [
+          {
+            "name": "eid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Eid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/experiences/{eid}/revision-quotes": {
+      "post": {
+        "summary": "Revision",
+        "operationId": "revision_api_v1_experiences__eid__revision_quotes_post",
+        "parameters": [
+          {
+            "name": "eid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Eid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Quote"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/experiences/{eid}/source-versions": {
+      "post": {
+        "summary": "Source Version",
+        "operationId": "source_version_api_v1_experiences__eid__source_versions_post",
+        "parameters": [
+          {
+            "name": "eid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Eid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SourceVersion"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/experiences/{eid}/activate": {
+      "post": {
+        "summary": "Activate",
+        "operationId": "activate_api_v1_experiences__eid__activate_post",
+        "parameters": [
+          {
+            "name": "eid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Eid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Activate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/experience-runs/{rid}": {
+      "get": {
+        "summary": "Run",
+        "operationId": "run_api_v1_experience_runs__rid__get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/experience-runs/{rid}/cancel": {
+      "post": {
+        "summary": "Cancel",
+        "operationId": "cancel_api_v1_experience_runs__rid__cancel_post",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/experience-runs/{rid}/resume": {
+      "post": {
+        "summary": "Resume",
+        "operationId": "resume_api_v1_experience_runs__rid__resume_post",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Resume"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/experience-artifacts/{aid}/manifest": {
+      "get": {
+        "summary": "Manifest",
+        "operationId": "manifest_api_v1_experience_artifacts__aid__manifest_get",
+        "parameters": [
+          {
+            "name": "aid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Aid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/experience-artifacts/{aid}/files/{fid}": {
+      "get": {
+        "summary": "File",
+        "operationId": "file_api_v1_experience_artifacts__aid__files__fid__get",
+        "parameters": [
+          {
+            "name": "aid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Aid"
+            }
+          },
+          {
+            "name": "fid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Fid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/experience-artifacts/{aid}/exports": {
+      "post": {
+        "summary": "Export",
+        "operationId": "export_api_v1_experience_artifacts__aid__exports_post",
+        "parameters": [
+          {
+            "name": "aid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Aid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Export"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/experience-runtime": {
+      "get": {
+        "summary": "Runtime",
+        "operationId": "runtime_api_v1_experience_runtime_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "summary": "Health",
@@ -2123,6 +2799,33 @@
   },
   "components": {
     "schemas": {
+      "Activate": {
+        "properties": {
+          "artifact_id": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "Artifact Id"
+          },
+          "expected_current_artifact_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Current Artifact Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "artifact_id"
+        ],
+        "title": "Activate"
+      },
       "AuditInput": {
         "properties": {
           "card_id": {
@@ -2199,6 +2902,39 @@
           "file"
         ],
         "title": "Body_upload_document_api_v1_knowledge_documents_post"
+      },
+      "Budget": {
+        "properties": {
+          "max_calls": {
+            "type": "integer",
+            "maximum": 4.0,
+            "minimum": 2.0,
+            "title": "Max Calls",
+            "default": 4
+          },
+          "max_repairs": {
+            "type": "integer",
+            "maximum": 2.0,
+            "minimum": 0.0,
+            "title": "Max Repairs",
+            "default": 2
+          },
+          "max_total_tokens": {
+            "type": "integer",
+            "maximum": 100000.0,
+            "minimum": 2000.0,
+            "title": "Max Total Tokens",
+            "default": 30000
+          },
+          "accounting_mode": {
+            "type": "string",
+            "title": "Accounting Mode",
+            "default": "estimated"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Budget"
       },
       "CaptureInput": {
         "properties": {
@@ -2447,6 +3183,60 @@
         ],
         "title": "EvidenceInput"
       },
+      "Export": {
+        "properties": {
+          "include_sources": {
+            "type": "boolean",
+            "title": "Include Sources",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Export"
+      },
+      "Generate": {
+        "properties": {
+          "accept_model_fingerprint": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Accept Model Fingerprint"
+          },
+          "accept_context_fingerprint": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Accept Context Fingerprint"
+          },
+          "accept_budget_mode": {
+            "type": "string",
+            "enum": [
+              "estimated",
+              "strict"
+            ],
+            "title": "Accept Budget Mode"
+          },
+          "base_artifact_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Artifact Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "accept_model_fingerprint",
+          "accept_context_fingerprint",
+          "accept_budget_mode"
+        ],
+        "title": "Generate"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -2618,6 +3408,42 @@
         ],
         "title": "OptimizeInput"
       },
+      "Quote": {
+        "properties": {
+          "expected_revision_id": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "Expected Revision Id"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "explainer",
+              "prototype"
+            ],
+            "title": "Mode",
+            "default": "explainer"
+          },
+          "goal": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "Goal",
+            "default": ""
+          },
+          "scope": {
+            "$ref": "#/components/schemas/Scope"
+          },
+          "budget_policy": {
+            "$ref": "#/components/schemas/Budget"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision_id"
+        ],
+        "title": "Quote"
+      },
       "RegenerateInput": {
         "properties": {
           "field": {
@@ -2640,6 +3466,65 @@
           "expected_revision_id"
         ],
         "title": "RegenerateInput"
+      },
+      "Resume": {
+        "properties": {
+          "confirm_unknown_charges": {
+            "type": "boolean",
+            "title": "Confirm Unknown Charges",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Resume"
+      },
+      "Scope": {
+        "properties": {
+          "selection": {
+            "type": "string",
+            "const": "current_card",
+            "title": "Selection",
+            "default": "current_card"
+          },
+          "include_original_questions": {
+            "type": "boolean",
+            "title": "Include Original Questions",
+            "default": true
+          },
+          "include_linked_evidence": {
+            "type": "boolean",
+            "title": "Include Linked Evidence",
+            "default": false
+          },
+          "memory_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Memory Id"
+          },
+          "answer_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Scope"
       },
       "SettingsInput": {
         "properties": {
@@ -2809,6 +3694,60 @@
         },
         "type": "object",
         "title": "SettingsInput"
+      },
+      "Source": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "maxLength": 131072,
+            "title": "Source"
+          },
+          "expected_revision_id": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "Expected Revision Id"
+          },
+          "expected_current_artifact_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Current Artifact Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "expected_revision_id"
+        ],
+        "title": "Source"
+      },
+      "SourceVersion": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "maxLength": 131072,
+            "title": "Source"
+          },
+          "base_artifact_id": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "Base Artifact Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "base_artifact_id"
+        ],
+        "title": "SourceVersion"
       },
       "ValidationError": {
         "properties": {

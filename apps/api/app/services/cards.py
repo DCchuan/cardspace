@@ -80,6 +80,8 @@ def serialize_card(db,row,detail=False):
     c['message_count']=db.execute('SELECT count(*) FROM messages WHERE conversation_id=?',(c['conversation_id'],)).fetchone()[0]
     if detail:
         r=require(db,'card_revisions',c['current_revision_id']); c['content']=r['content']
+        from .experiences import summaries
+        c['experience_summary']=summaries(db,[c['id']]).get(c['id'])
         c['field_ownership']={r['field']:{**dict(r),'rejected':json.loads(r['rejected'])} for r in db.execute('SELECT * FROM field_ownership WHERE card_id=?',(c['id'],))}
         label=db.execute("SELECT detail FROM operation_logs WHERE target_id=? AND action='source.label' ORDER BY timestamp DESC LIMIT 1",(c['id'],)).fetchone()
         c['source_label']=json.loads(label[0]).get('label','') if label else ''
@@ -164,6 +166,9 @@ def list_cards(q='',kind='',tag='',favorite=False,archived=False,sort='updated',
             rows=sorted(rows,key=lambda row:scores.get(row['id'],0),reverse=True)[offset:offset+limit]
         else: rows=db.execute('SELECT c.* FROM cards c LEFT JOIN sources s ON s.id=c.source_id WHERE '+clause+' ORDER BY '+order+' LIMIT ? OFFSET ?',params+[limit,offset]).fetchall()
         items=[serialize_card(db,r) for r in rows]
+        from .experiences import summaries
+        experience_summaries=summaries(db,[item['id'] for item in items])
+        for item in items:item['experience_summary']=experience_summaries.get(item['id'])
         if q.strip():
             for item in items:
                 memories=[dict(r) for r in db.execute('SELECT q.* FROM question_memories q JOIN conversations cv ON cv.id=q.conversation_id JOIN source_snapshots ss ON ss.id=cv.snapshot_id WHERE ss.source_id=?',(item['source_id'],))]

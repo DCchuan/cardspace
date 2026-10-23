@@ -1,4 +1,11 @@
 export type Card = {
+  experience_summary?: {
+    experience_id: string;
+    artifact_id: string | null;
+    run_id: string | null;
+    status: string;
+    freshness: string;
+  } | null;
   id: string;
   title: string;
   source_label?: string;
@@ -152,3 +159,17 @@ export const sourceName: Record<string, string> = {
   deepseek: "DeepSeek",
   document: "参考资料",
 };
+
+export async function apiBlob(
+  path: string,
+  options: RequestInit = {},
+): Promise<Blob> {
+  await session();
+  let res = await localFetch(path, options);
+  if (res.status === 401) {
+    await reconnect();
+    res = await localFetch(path, options);
+  }
+  if (!res.ok) throw await responseError(res);
+  return res.blob();
+}

@@ -34,7 +34,7 @@ def create_backup(actor='human'):
 def restore_backup(blob,actor='human'):
     with LOCK:
         with connect() as db:
-            if db.execute("SELECT 1 FROM jobs WHERE status IN ('queued','running','processing')").fetchone():raise HTTPException(409,'请先等待或取消当前任务，再恢复备份。')
+            if db.execute("SELECT 1 FROM jobs WHERE status IN ('queued','running','processing','planning','generating','compiling','validating','repairing','cancel_requested')").fetchone():raise HTTPException(409,'请先等待或取消当前任务，再恢复备份。')
         try:
             with zipfile.ZipFile(io.BytesIO(blob)) as z:
                 if sum(f.file_size for f in z.infolist())>512*1024*1024:raise ValueError('备份解压后超过 512MB')
@@ -47,9 +47,28 @@ def restore_backup(blob,actor='human'):
                 try:
                     if src.execute('PRAGMA integrity_check').fetchone()[0]!='ok':raise ValueError('数据库完整性检查失败')
                     if src.execute('PRAGMA foreign_key_check').fetchall():raise ValueError('数据库外键校验失败')
-                    if src.execute('SELECT max(version) FROM schema_migrations').fetchone()[0] not in (1,2):raise ValueError('数据库版本不兼容')
+                    if src.execute('SELECT max(version) FROM schema_migrations').fetchone()[0] not in (1,2,3):raise ValueError('数据库版本不兼容')
                     for raw,digest in src.execute('SELECT raw,hash FROM source_snapshots'):
                         if hashlib.sha256(raw).hexdigest()!=digest:raise ValueError('原始快照哈希校验失败')
+                    if src.execute('SELECT max(version) FROM schema_migrations').fetchone()[0]==3:
+                        from .experience_context import digest
+                        for f in src.execute('SELECT bytes,sha256 FROM experience_files'):
+                            if hashlib.sha256(f[0]).hexdigest()!=f[1]:raise ValueError('演示文件哈希校验失败')
+                        for aid,sdk,schema in src.execute('SELECT id,sdk_version,schema_version FROM experience_artifacts'):
+                            if sdk!='experience-sdk.v1' or schema!='experience.v1':raise ValueError('未知演示协议版本')
+                            files={path:(blob,h) for path,blob,h in src.execute('SELECT path,bytes,sha256 FROM experience_files WHERE artifact_id=?',(aid,))}
+                            if set(files)!={'experience.tsx','experience.json'}:raise ValueError('演示文件路径无效')
+                            m=json.loads(src.execute('SELECT manifest FROM experience_artifacts WHERE id=?',(aid,)).fetchone()[0])
+                            if m['files']!={p:h for p,(blob,h) in files.items()} or m['spec']!=json.loads(files['experience.json'][0]):raise ValueError('演示清单不一致')
+                        for m,h in src.execute('SELECT manifest,artifact_hash FROM experience_artifacts'):
+                            if digest(json.loads(m))!=h:raise ValueError('演示产物哈希校验失败')
+                        for raw,fp in src.execute('SELECT canonical_pack,content_fingerprint FROM experience_contexts'):
+                            pack=json.loads(raw)
+                            for ref in pack['refs']:
+                                if digest(ref['quote'])!=ref['quote_sha256'] or len(ref['quote'])!=ref['end_char']-ref['start_char']:raise ValueError('演示引用校验失败')
+                            if digest([{'kind':r['kind'],'text':r['quote']} for r in pack['refs']])!=fp:raise ValueError('演示上下文校验失败')
+                        for raw,h in src.execute('SELECT response_bytes,response_sha256 FROM generation_calls WHERE response_bytes IS NOT NULL'):
+                            if hashlib.sha256(raw).hexdigest()!=h:raise ValueError('模型响应哈希校验失败')
                     # Verify required tables before touching the running database.
                     required=['cards','card_revisions','jobs','settings','card_fts','operation_logs','embeddings','approval_requests','knowledge_documents','knowledge_chunks','messages','conversations','evidence','audit_findings','card_links','sources','question_memories','memory_messages','snapshot_origins']
                     for table in required:src.execute(f'SELECT * FROM {table} LIMIT 0')

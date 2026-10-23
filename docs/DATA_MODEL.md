@@ -1,6 +1,6 @@
 # 数据模型
 
-完整 SQL 为 `migrations/001_initial.sql` 与 `002_minimal.sql`，当前 schema version=2。v1 升级前对非空旧库生成 `pre-v03-*.sqlite3` 恢复副本；已有字段按人工接管处理。v1 / v2 ZIP 备份均可恢复，v1 在恢复后自动补迁移。
+完整 SQL 为 `migrations/001_initial.sql` 、`002_minimal.sql` 与 `003_experiences.sql`，当前 schema version=3。v1 升级前对非空旧库生成 `pre-v03-*.sqlite3` 恢复副本；已有字段按人工接管处理。v1 / v2 / v3 ZIP 备份均可恢复，v1 在恢复后自动补迁移。
 
 - sources → source_snapshots：来源身份与内容哈希分离，快照 BLOB 保留原始文字 / JSON / 二进制文档。SQL 触发器禁止更新和删除快照。snapshot_origins 将每个对话快照连接到完整导出文件，原始字节与额外元数据均可下载。
 - source_snapshots → conversations → messages：每个导入版本拥有独立会话，消息保存原始节点 ID、父节点、角色与导入位置；旧快照与旧会话不会覆盖。
@@ -25,3 +25,5 @@
 - `capture.dismiss` 操作日志：只收起无需处理的回执，不篡改采集完成度、不删除原始输入。
 
 已有 REST / MCP 输入及不可变 source_snapshots 不变。正文和事实状态不属于自动元信息写入范围；来源修正只改变显示名称，不改写真实来源或原始快照。
+
+V0.4 新增独立的 Experience/Context/Quote/Grant/Run/Call/Artifact/File/State 表。上下文、报价、授权、产物与文件不可变；当前版本指针通过 CAS 修改。升级前备份 pre-v04，恢复时核对产物/文件/引用/响应哈希。详见实施记录。

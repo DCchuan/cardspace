@@ -97,4 +97,31 @@ def capture_memory(content:str) -> dict:
     """自动识别录入内容，先保存原始输入再异步处理。Agent 录入不触发人类专属的自动模型处理。"""
     return request('POST','/captures',{'content':content})
 
+@mcp.tool()
+def prepare_experience(card_id:str) -> dict:
+    """本地准备当前正文范围与来源 ref ID，不调用模型、不批准预算。"""
+    return request('GET','/cards/'+card_id+'/experience-context')
+
+@mcp.tool()
+def get_experience(experience_id:str) -> dict:
+    """读取演示、版本与最新任务状态，不触发生成。"""
+    return request('GET','/experiences/'+experience_id)
+
+@mcp.tool()
+def get_experience_source(artifact_id:str) -> dict:
+    """返回规范与文件 ID，TSX 为文本，不执行。"""
+    result=request('GET','/experience-artifacts/'+artifact_id+'/manifest')
+    if 'error' in result:return result
+    file=next((f for f in result['files'] if f['path']=='experience.tsx'),None)
+    if file:
+        with httpx.Client(timeout=12,trust_env=False) as client:
+            response=client.get(BASE+'/experience-artifacts/'+artifact_id+'/files/'+file['id'],headers={'Authorization':'Bearer '+TOKEN})
+            if response.status_code==200:result['source']=response.text
+    return result
+
+@mcp.tool()
+def submit_experience_source(card_id:str,source:str,expected_revision_id:str,expected_current_artifact_id:str|None=None) -> dict:
+    """本地静态编译 Agent 源码，保存候选演示；人类选择启用，不调用软件模型。"""
+    return request('POST','/cards/'+card_id+'/experience-sources',{'source':source,'expected_revision_id':expected_revision_id,'expected_current_artifact_id':expected_current_artifact_id})
+
 if __name__=='__main__':mcp.run(transport='stdio')

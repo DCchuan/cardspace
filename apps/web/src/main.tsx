@@ -1,3 +1,4 @@
+import { ExperienceButton, ExperienceHost } from "./experiences/Experience";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -126,6 +127,21 @@ function App() {
   const [undo, setUndo] = useState<null | (() => Promise<void>)>(null);
   const [capture, setCapture] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [experienceJump, setExperienceJump] = useState<any>(null);
+  useEffect(() => {
+    const opening = () => setSelected(null);
+    const source = (e: Event) => {
+      const d = (e as CustomEvent).detail;
+      setExperienceJump(d);
+      setSelected(d.card_id);
+    };
+    window.addEventListener("cardspace-experience", opening);
+    window.addEventListener("cardspace-experience-source", source);
+    return () => {
+      window.removeEventListener("cardspace-experience", opening);
+      window.removeEventListener("cardspace-experience-source", source);
+    };
+  }, []);
   const [toast, setToast] = useState("");
   const [mobile, setMobile] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
@@ -724,23 +740,37 @@ function App() {
           }}
         />
       )}
+      <ExperienceHost
+        configure={() => {
+          setSelected(null);
+          setPage("settings");
+        }}
+      />
       {selected && (
         <CardDrawer
-          key={selected}
+          key={selected + ":" + (experienceJump?.message_id || "")}
           id={selected}
           jumpConversation={
-            search
-              ? cards.data?.items.find((c) => c.id === selected)
-                  ?.matched_memories?.[0]?.conversation_id
-              : undefined
+            experienceJump?.card_id === selected &&
+            experienceJump?.conversation_id
+              ? experienceJump.conversation_id
+              : search
+                ? cards.data?.items.find((c) => c.id === selected)
+                    ?.matched_memories?.[0]?.conversation_id
+                : undefined
           }
           jumpMessage={
-            search
-              ? cards.data?.items.find((c) => c.id === selected)
-                  ?.matched_memories?.[0]?.message_ids?.[0]
-              : undefined
+            experienceJump?.card_id === selected && experienceJump?.message_id
+              ? experienceJump.message_id
+              : search
+                ? cards.data?.items.find((c) => c.id === selected)
+                    ?.matched_memories?.[0]?.message_ids?.[0]
+                : undefined
           }
-          close={() => setSelected(null)}
+          close={() => {
+            setSelected(null);
+            setExperienceJump(null);
+          }}
           open={setSelected}
           notify={notify}
         />
@@ -837,6 +867,7 @@ function MemoryCard({
           />
           {sourceName[c.source_type] || "本地记录"}
         </span>
+        <ExperienceButton card={c} />
       </div>
     </article>
   );
@@ -1144,6 +1175,7 @@ function CardDrawer({
                 </span>
               </div>
               <InlineEditable key={id + "tags"} card={c} field="tags" />
+              <ExperienceButton card={c} />
             </div>
             <div className="drawer-body">
               <InlineEditable

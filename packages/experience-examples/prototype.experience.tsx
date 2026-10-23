@@ -1,0 +1,16 @@
+import {defineExperience,Stack,Heading,Paragraph,Input,Button,List,SourceLink} from '@cardspace/experience';
+export default defineExperience({version: "experience.v1",
+title: "待办应用最小原型",
+mode: "prototype",
+assumptions: [{"id":"example","text":"本演示为本地教学模拟，不连接实际账户或支付系统。","origin":"illustration","source_refs":["s1"]}],
+state: {"task":{"kind":"string","initial":"阅读原文","max_length":120}},
+datasets: {"tasks":{"origin":"illustration","source_refs":[],"rows":[]}},
+derivations: [],
+actions: {"add":{"kind":"append_row","data_key":"tasks","values":{"label":{"state":"task"}}},"clear":{"kind":"set","state_key":"task","value":{"literal":""}},"submit":{"kind":"sequence","action_ids":["add","clear"]},"remove":{"kind":"remove_row","data_key":"tasks","row_id":{"literal":"row_1"}}},
+view:(<Stack id={"root"}><Heading id={"title"} text={"待办应用最小原型"} />
+<Paragraph id={"intro"} text={"输入并添加任务，展示本地列表操作。刷新或重置可恢复初始状态。"} origin={"illustration"} source_refs={["s1"]} />
+<Input id={"input"} label={"任务"} state_key={"task"} />
+<Button id={"submit"} label={"添加任务"} action_id={"submit"} />
+<List id={"list"} data_key={"tasks"} label_key={"label"} />
+<Button id={"remove"} label={"移除第一个示例任务"} action_id={"remove"} />
+<SourceLink id={"source"} ref_id={"s1"} /></Stack>)});
