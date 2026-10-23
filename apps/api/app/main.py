@@ -21,10 +21,12 @@ from .adapters.conversations import ImportProblem
 @asynccontextmanager
 async def lifespan(app):
     init_db();thread=queue.start()
+    from .workers import experience_queue
+    experience_thread=experience_queue.start()
     yield
-    queue.STOP.set();thread.join(timeout=5)
+    queue.STOP.set();experience_queue.STOP.set();thread.join(timeout=5);experience_thread.join(timeout=2)
 
-app=FastAPI(title='CardSpace API',version='0.3.0',lifespan=lifespan)
+app=FastAPI(title='CardSpace API',version='0.4.0',lifespan=lifespan)
 app.add_middleware(TrustedHostMiddleware,allowed_hosts=['127.0.0.1','localhost','[::1]','testserver'])
 
 @app.exception_handler(ImportProblem)
@@ -57,8 +59,11 @@ def human(who=Depends(actor)):
     if who!='human':raise HTTPException(403,'此操作需要人类用户在界面中确认。')
     return who
 
+from .experience_routes import router as experience_router
+app.include_router(experience_router(actor,human))
+
 @app.get('/api/health')
-def health():return {'status':'ok','version':'0.3.0'}
+def health():return {'status':'ok','version':'0.4.0'}
 
 @app.post('/api/v1/session')
 def session(request:Request,response:Response):
@@ -294,6 +299,11 @@ def job(job_id:str,who=Depends(actor)):
 def cancel(job_id:str,who=Depends(actor)):
     with connect() as db:
         j=require(db,'jobs',job_id)
+        if j['job_type']=='experience_generate':
+            human(who)
+            from .services.experiences import cancel as cancel_experience
+            row=db.execute('SELECT id FROM experience_runs WHERE job_id=?',(job_id,)).fetchone()
+            return cancel_experience(row['id'])
         if j['status'] not in ('queued','running'):raise HTTPException(409,'任务已经结束，无需取消。')
         db.execute("UPDATE jobs SET status='cancelled',updated_at=? WHERE id=?",(now(),job_id))
         if j['job_type']=='capture' and j['status']=='queued':db.execute("UPDATE captures SET status='failed',error='处理已取消，原始输入仍保留，可重试。',updated_at=? WHERE job_id=?",(now(),job_id))
@@ -304,6 +314,7 @@ def cancel(job_id:str,who=Depends(actor)):
 def retry(job_id:str,who=Depends(actor)):
     with connect() as db:
         j=require(db,'jobs',job_id)
+        if j['job_type']=='experience_generate':raise HTTPException(409,'请在演示中重新报价或明确确认继续，不能通过通用重试调用模型。')
         if j['status'] not in ('failed','cancelled'):raise HTTPException(409,'仅失败或取消任务可以重试')
         db.execute("UPDATE jobs SET status='queued',error=NULL,progress=0,updated_at=? WHERE id=?",(now(),job_id));log(db,who,'job.retry',job_id)
     return {'job_id':job_id}

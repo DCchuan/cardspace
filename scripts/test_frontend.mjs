@@ -9,7 +9,7 @@ const esbuild = require("esbuild");
 const outputDir = fileURLToPath(
   new URL("../apps/web/node_modules/.cache/cardspace-tests/", import.meta.url),
 );
-const cases = ["autosave", "connection", "navigation"];
+const cases = ["autosave", "connection", "navigation", "experience"];
 await mkdir(outputDir, { recursive: true });
 await esbuild.build({
   entryPoints: cases.map((name) =>

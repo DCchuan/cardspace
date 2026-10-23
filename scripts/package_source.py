@@ -10,13 +10,13 @@ ROOT_FILES = (
     'LICENSE', 'README.md', 'README.en.md', 'CONTRIBUTING.md', 'CODE_OF_CONDUCT.md',
     'SECURITY.md', 'THIRD_PARTY_NOTICES.md', 'package.json', 'requirements.txt',
     'requirements.lock.txt', 'pyproject.toml', '.env.example', '.gitignore',
-    '启动 CardSpace.command',
+    '启动 CardSpace.command', '启动 CardSpace v0.4.command',
 )
 CODE_DIRECTORIES = ('apps', 'packages', 'migrations', 'scripts', 'tests', '.github')
-SUFFIXES = {'.py', '.ts', '.tsx', '.css', '.html', '.json', '.sql', '.md', '.mjs', '.sh', '.yml', '.yaml', '.toml'}
+SUFFIXES = {'.py', '.ts', '.tsx', '.css', '.html', '.json', '.sql', '.md', '.mjs', '.sh', '.yml', '.yaml', '.toml', '.cjs', '.js'}
 EXCLUDE_PARTS = {'node_modules', '.venv', 'dist', '__pycache__', '.git', 'output', '.pytest_cache'}
 # Original pasted planning notes are not automatically published as project source.
-PUBLIC_DOCS = ('MINIMAL_INTERACTION_PROPOSAL.md', 'ARCHITECTURE.md', 'DATA_MODEL.md', 'API_SPEC.md', 'SECURITY.md', 'IMPLEMENTATION.md', 'ACCEPTANCE.md', 'ADAPTERS.md', 'DESIGN.md', 'RELEASE.md', 'ADR/001-local-modular-monolith.md')
+PUBLIC_DOCS = ('MINIMAL_INTERACTION_PROPOSAL.md', 'ARCHITECTURE.md', 'DATA_MODEL.md', 'API_SPEC.md', 'SECURITY.md', 'IMPLEMENTATION.md', 'ACCEPTANCE.md', 'ADAPTERS.md', 'DESIGN.md', 'RELEASE.md', 'ADR/001-local-modular-monolith.md', 'ADR/002-controlled-experience-language.md', 'plans/v0.4/IMPLEMENTATION.md')
 
 
 def source_files(root=ROOT):
@@ -32,6 +32,8 @@ def source_files(root=ROOT):
         relative = path.relative_to(root)
         if data_dir and path.resolve().is_relative_to(data_dir):
             continue
+        if relative.parts[:2]==('packages','experience-runtime') and path.name=='trusted.js':
+            continue  # Rebuilt from reviewed sources during setup.
         if relative.parts[0]=='apps' and path.suffix=='.json' and path.name not in {'package.json','package-lock.json','tsconfig.json','tsconfig.node.json','tsconfig.app.json'}:
             continue
         if any(part in EXCLUDE_PARTS for part in relative.parts):

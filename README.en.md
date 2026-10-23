@@ -17,6 +17,10 @@ npm start
 
 Open http://127.0.0.1:8765. Development: `npm run dev`. Tests: `npm test`. Production build: `npm run build`. Source distribution: `npm run source`.
 
+## V0.4 interactive experiences (development)
+
+Cards expose Generate/Open experience. A local quote fixes selected sources, model and estimated budget; only a human can authorize paid generation. Controlled TSX is statically compiled to a fixed specification, rendered by a trusted iframe/Worker runtime. Existing playback, local source edits and offline export need no model calls. Real-model quality evaluation and user research remain pending; no v0.4.0 Release is declared. See [implementation and isolated startup](docs/plans/v0.4/IMPLEMENTATION.md).
+
 ## Capture and recall
 
 - Paste a public ChatGPT or DeepSeek `/share/…` link, conversation text, or a supported JSON file.

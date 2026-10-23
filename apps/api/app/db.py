@@ -47,6 +47,14 @@ def init_db():
                 finally: dest.close()
             db.executescript('BEGIN IMMEDIATE;\n'+(ROOT / 'migrations/002_minimal.sql').read_text()+'\nCOMMIT;')
             db.execute('INSERT INTO schema_migrations VALUES(2,?)',(now(),))
+        if not db.execute('SELECT 1 FROM schema_migrations WHERE version=3').fetchone():
+            db.commit()
+            if db.execute('SELECT 1 FROM cards LIMIT 1').fetchone():
+                from .core import BACKUP_DIR
+                dest=sqlite3.connect(BACKUP_DIR / ('pre-v04-'+now().replace(':','-')+'.sqlite3'))
+                try:db.backup(dest)
+                finally:dest.close()
+            db.executescript('BEGIN IMMEDIATE;\n'+(ROOT/'migrations/003_experiences.sql').read_text()+"\nINSERT INTO schema_migrations VALUES(3,datetime('now'));\nCOMMIT;")
         defaults = {'model_base_url':'https://api.openai.com/v1', 'model':'', 'embedding_model':'', 'allow_cloud':False, 'audit_interval_days':7, 'next_audit_at':'', 'auto_audit':False, 'incremental_audit':False, 'backup_interval_days':1, 'last_backup_at':'', 'auto_metadata':False, 'auto_semantic':False, 'model_daily_calls':20, 'model_max_input_chars':16000, 'default_tag':''}
         for k,v in defaults.items():
             db.execute('INSERT OR IGNORE INTO settings VALUES(?,?)',(k,dumps(v)))
@@ -60,7 +68,9 @@ def init_db():
             db.execute('INSERT INTO jobs VALUES(?,?,?,?,?,?,?,?,?,?)',(jid,'capture','queued',0,0,dumps({'capture_id':c['id']}),None,None,stamp,stamp))
             db.execute('UPDATE captures SET job_id=? WHERE id=?',(jid,c['id']))
         # Interrupted jobs are retried. Services use transactional content hashes and idempotency.
-        db.execute("UPDATE jobs SET status='queued',progress=0,error='进程重启，已恢复到队列' WHERE status IN ('running','captured','processing')")
+        db.execute("UPDATE jobs SET status='queued',progress=0,error='进程重启，已恢复到队列' WHERE status IN ('running','captured','processing') AND job_type!='experience_generate'")
+        from .workers.experience_queue import recover
+        recover(db)
 
 
 def log(db, actor, action, target=None, detail=None):

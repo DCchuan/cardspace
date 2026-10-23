@@ -94,7 +94,7 @@ def run_embeddings(jid,payload):
 
 def run_one():
     with connect() as db:
-        row=db.execute("SELECT * FROM jobs WHERE status='queued' ORDER BY created_at LIMIT 1").fetchone()
+        row=db.execute("SELECT * FROM jobs WHERE status='queued' AND job_type IN ('import','capture','metadata','semantic-index','audit','optimization','embeddings') ORDER BY created_at LIMIT 1").fetchone()
         if not row:return False
         job=dict(row)
         db.execute("UPDATE jobs SET status='running',attempts=attempts+1,progress=5,updated_at=? WHERE id=?",(now(),job['id']))

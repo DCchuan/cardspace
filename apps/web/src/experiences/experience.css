@@ -1,0 +1,299 @@
+.experience-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(93, 74, 137, 0.2);
+  background: rgba(255, 255, 255, 0.66);
+  color: #63517e;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: normal;
+}
+.experience-entry:hover {
+  background: #fff;
+}
+.card-bottom {
+  justify-content: space-between;
+  gap: 10px;
+}
+.experience-backdrop {
+  position: fixed;
+  inset: 0;
+  background: #24212b60;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(4px);
+}
+.experience-panel {
+  width: 100%;
+  max-width: 1000px;
+  max-height: 94vh;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #e3dfeb;
+  border-radius: 18px;
+  box-shadow: 0 25px 100px #18102033;
+  outline: none;
+  color: #35313e;
+}
+.experience-panel header {
+  padding: 22px 26px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  border-bottom: 1px solid #efecf3;
+  position: sticky;
+  top: 0;
+  background: #fffffff5;
+  z-index: 2;
+}
+.experience-panel h2 {
+  font-size: 20px;
+  margin: 2px 0;
+}
+.experience-panel h3 {
+  font-size: 17px;
+  margin: 0 0 14px;
+}
+.experience-panel small {
+  font-size: 12px;
+  color: #82798f;
+}
+.experience-panel nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.experience-panel button {
+  padding: 9px 13px;
+  border: 1px solid #e2dce9;
+  border-radius: 9px;
+  background: white;
+  color: #63517e;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.experience-panel button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.experience-panel button:focus-visible,
+.experience-panel input:focus-visible,
+.experience-panel summary:focus-visible,
+.experience-panel textarea:focus-visible,
+.experience-panel select:focus-visible {
+  outline: 3px solid #b0a0cf;
+  outline-offset: 2px;
+}
+.experience-panel details summary {
+  cursor: pointer;
+  color: #756486;
+  font-size: 13px;
+  padding: 12px 0;
+}
+.experience-panel nav details {
+  position: relative;
+}
+.experience-panel nav summary {
+  list-style: none;
+  padding: 8px 12px;
+}
+.experience-menu {
+  position: absolute;
+  right: 0;
+  min-width: 190px;
+  background: white;
+  border: 1px solid #ddd5e7;
+  border-radius: 10px;
+  box-shadow: 0 8px 25px #30263e20;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.experience-menu button {
+  text-align: left;
+  border: 0;
+}
+.experience-panel iframe {
+  display: block;
+  width: 100%;
+  height: 540px;
+  border: 0;
+  background: #fff;
+}
+.experience-consent {
+  max-width: 720px;
+  margin: auto;
+  padding: 30px;
+}
+.experience-consent > p,
+.experience-side > p,
+.experience-progress p {
+  font-size: 14px;
+  color: #817889;
+  line-height: 1.7;
+}
+.experience-panel label {
+  display: block;
+  font-size: 14px;
+  margin: 14px 0;
+}
+.experience-panel textarea,
+.experience-panel select,
+.experience-panel input[type="number"] {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ded7e6;
+  border-radius: 9px;
+  font: inherit;
+  margin-top: 8px;
+  background: #fff;
+}
+.experience-panel textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+.experience-panel .experience-code {
+  min-height: 280px;
+  font:
+    12px/1.6 ui-monospace,
+    monospace;
+  tab-size: 2;
+  white-space: pre;
+}
+.experience-panel .experience-primary {
+  background: #63517e;
+  color: #fff;
+  border-color: #63517e;
+}
+.experience-panel .experience-text {
+  border: 0;
+  padding-left: 0;
+  color: #91829e;
+}
+.experience-quote {
+  background: #f9f7fc;
+  padding: 18px;
+  border: 1px solid #ebe5f1;
+  border-radius: 12px;
+  margin: 15px 0;
+}
+.experience-quote p {
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.experience-panel pre {
+  font:
+    13px/1.7 system-ui,
+    sans-serif;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 280px;
+  overflow: auto;
+  background: #fcfbfd;
+  padding: 12px;
+  border-radius: 8px;
+}
+.experience-notice {
+  margin: 14px 24px;
+  padding: 12px 16px;
+  border-radius: 9px;
+  background: #faf4e8;
+  color: #857047;
+  font-size: 13px;
+}
+.experience-notice button {
+  margin-left: 14px;
+}
+.experience-progress {
+  margin: 20px 26px;
+  padding: 18px;
+  background: #f8f6fb;
+  border-radius: 12px;
+}
+.experience-progress > button {
+  margin-left: 20px;
+}
+.experience-options {
+  padding: 0 16px;
+  border-left: 2px solid #e9e3f1;
+}
+.experience-side {
+  padding: 24px;
+  border-top: 1px solid #eee8f5;
+}
+.experience-side article {
+  padding: 16px;
+  border: 1px solid #eee7f4;
+  border-radius: 10px;
+  margin: 12px 0;
+}
+.experience-side article.selected {
+  border-color: #aa95c8;
+}
+.experience-version {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin: 12px 0;
+}
+.experience-panel .experience-accept {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.experience-panel input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: #7b669b;
+}
+@media (max-width: 600px) {
+  .experience-backdrop {
+    padding: 8px;
+  }
+  .experience-panel {
+    max-height: 98dvh;
+    border-radius: 12px;
+  }
+  .experience-panel header {
+    padding: 15px;
+    gap: 6px;
+  }
+  .experience-panel h2 {
+    font-size: 16px;
+  }
+  .experience-panel nav {
+    gap: 2px;
+  }
+  .experience-panel nav button {
+    padding: 8px;
+  }
+  .experience-consent,
+  .experience-side {
+    padding: 20px;
+  }
+  .experience-panel iframe {
+    height: 550px;
+  }
+  .experience-progress {
+    margin: 16px;
+  }
+  .experience-version {
+    flex-wrap: wrap;
+  }
+  .experience-entry {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+}
